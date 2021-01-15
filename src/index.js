@@ -15,13 +15,26 @@ app.get("/totalrecovered",async(req,res)=>{
             $group:{
                 _id:"total",
                 recovered:{$sum:"$recovered"},
-               count:{$sum:1}
+              // count:{$sum:1}
             },
         },
     ]);
-    res.send(resDoc);
+    const firstresult=resDoc[0];
+    res.send({data:firstresult});
 });
 
+app.get("/totaldeath",async(req,res)=>{
+    const resDoc=await covidTallyModel.aggregate([
+        {
+            $group:{
+                _id:"total",
+                death:{$sum:"$death"},
+            },
+        },
+    ]);
+    const firstresult=resDoc[0];
+    res.send({data:firstresult});
+});
 app.get("/totalActive",async(req,res)=>{
     const resDoc=await covidTallyModel.aggregate([
         {
@@ -36,7 +49,60 @@ app.get("/totalActive",async(req,res)=>{
     res.send({data:{_id:"total",active:Result.infected-Result.recoverd}});
 });
 
+ app.get("/hotspotStates",async(req,res)=>{
+    const resDoc=await covidTallyModel.aggregate([
+        {
+            $project:{
+                state:"$state",
+                rate:{
+                    $round:[
+                        {
+                            $divide:[
+                                {
+                                    $substract:["$infected","$recovered"] },
+                                    "$infected",
+                            ] 
+                        },
+                        5,
+                    ],
+                },
+            },
+        },
+        {
+            $match:{
+                rate:{$gt:0.1}
+            }
+        }
+    ]);
+    res.send({data:resDoc});
+});
 
+app.get("/healthyStates",async(req,res)=>{
+    const resDoc=await covidTallyModel.aggregate([
+        {
+            $project:{
+                state:"$state",
+                mortality:{
+                    $round:[
+                        {
+                            $divide:[
+                                "$death",
+                                "$infected",
+                            ] 
+                        },
+                        5,
+                    ],
+                },
+            },
+        },
+        {
+            $match:{
+                mortality:{$gt:0.005}
+            }
+        }
+    ]);
+    res.send({data:resDoc});
+});
 app.listen(port, () => console.log(`App listening on port ${port}!`))
 
 module.exports = app;
