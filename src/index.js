@@ -101,11 +101,11 @@ app.get("/totalActive",async(req,res)=>{
                 _id:"total",
                 recovered:{$sum:"$recovered"},
                 infected:{$sum:"$infected"},
-            }
+            },
     },
     ]);
     const Result=resDoc[0];
-    res.send({data:{_id:"total",active:Result.infected-Result.recoverd}});
+    res.send({data:{_id:"total",active:Result.infected-Result.recovered}});
 });
 app.listen(port, () => console.log(`App listening on port ${port}!`))
 
