@@ -48,7 +48,7 @@ app.get("/totaldeath",async(req,res)=>{
                         {
                             $divide:[
                                 {
-                                    $substract:["$infected","$recovered"] },
+                                    $subtract:["$infected","$recovered"] },
                                     "$infected",
                             ] 
                         },
@@ -59,7 +59,7 @@ app.get("/totaldeath",async(req,res)=>{
         },
         {
             $match:{
-                rate:{$gt:0.1}
+                rate: {$gt:0.1}
             }
         }
     ]);
