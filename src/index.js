@@ -35,18 +35,7 @@ app.get("/totaldeath",async(req,res)=>{
     const firstresult=resDoc[0];
     res.send({data:firstresult});
 });
-app.get("/totalActive",async(req,res)=>{
-    const resDoc=await covidTallyModel.aggregate([
-        {
-            $group:{
-                _id:"total",
-                recovered:{$sum:"$recovered"},
-                infected:{$sum:"$infected"},
-            }
-    },
-    ]);
-    const Result=resDoc[0];
-    res.send({data:{_id:"total",active:Result.infected-Result.recoverd}});
+
 });
 
  app.get("/hotspotStates",async(req,res)=>{
@@ -104,6 +93,19 @@ app.get("/healthyStates",async(req,res)=>{
     ]);
     res.send({data:resDoc});
 });
+
+app.get("/totalActive",async(req,res)=>{
+    const resDoc=await covidTallyModel.aggregate([
+        {
+            $group:{
+                _id:"total",
+                recovered:{$sum:"$recovered"},
+                infected:{$sum:"$infected"},
+            }
+    },
+    ]);
+    const Result=resDoc[0];
+    res.send({data:{_id:"total",active:Result.infected-Result.recoverd}});
 app.listen(port, () => console.log(`App listening on port ${port}!`))
 
 module.exports = app;
